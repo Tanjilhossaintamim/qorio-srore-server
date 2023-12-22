@@ -20,11 +20,14 @@ const productSchema = new Schema({
       size: [
         {
           sizeName: String,
-          enum: ["xs", "m", "lg", "xl"],
         },
       ],
     },
   ],
+  price: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Product = model("Product", productSchema);
