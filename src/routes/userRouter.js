@@ -4,12 +4,12 @@ const {
   errorResponse,
   successResponse,
 } = require("../handler/responseHandler");
-const createError = require("http-errors");
 const { createJsonWebToken } = require("../utils/jwt/createjsonwebtoken");
 const { emailWithNodemailer } = require("../config/email");
 const html = require("../utils/template");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const createHttpError = require("http-errors");
 
 const userRouter = Router();
 
@@ -76,6 +76,46 @@ userRouter.post("/verify", async (req, res) => {
       return errorResponse(res, { status: 500, message: err?.message });
     }
   });
+});
+
+// login user
+
+userRouter.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  // validation first step
+  if (!email || !password) {
+    return errorResponse(res, {
+      status: 403,
+      message: "Please Provide all required information",
+    });
+  }
+  try {
+    const userExists = await User.findOne({ email });
+    if (!userExists) {
+      return errorResponse(res, {
+        status: 403,
+        message: "Please Provide Valid Email !",
+      });
+    }
+
+    // valid password checking
+    const isPasswordMatched = await bcrypt.compare(
+      password,
+      userExists.password
+    );
+    if (!isPasswordMatched) {
+      return errorResponse(res, { status: 401, message: "Invalid Password !" });
+    }
+    return successResponse(res, {
+      status: 200,
+      message: "Login Successfully !",
+      payload: {
+        name: userExists.name,
+        email: userExists.email,
+        phone: userExists.phone,
+      },
+    });
+  } catch (error) {}
 });
 
 module.exports = userRouter;
