@@ -9,7 +9,6 @@ const { emailWithNodemailer } = require("../config/email");
 const html = require("../utils/template");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const createHttpError = require("http-errors");
 
 const userRouter = Router();
 
@@ -99,13 +98,27 @@ userRouter.post("/login", async (req, res) => {
     }
 
     // valid password checking
-    const isPasswordMatched = await bcrypt.compare(
-      password,
-      userExists.password
-    );
+    const isPasswordMatched = bcrypt.compare(password, userExists.password);
     if (!isPasswordMatched) {
       return errorResponse(res, { status: 401, message: "Invalid Password !" });
     }
+    // generate jwt token
+    const token = createJsonWebToken(
+      {
+        name: userExists.name,
+        email: userExists.email,
+        phone: userExists.phone,
+        _id: userExists._id,
+      },
+      process.env.SECRET_KEY,
+      "72h"
+    );
+    // set http only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
     return successResponse(res, {
       status: 200,
       message: "Login Successfully !",
@@ -115,7 +128,9 @@ userRouter.post("/login", async (req, res) => {
         phone: userExists.phone,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    return errorResponse(res, { status: 500, message: error?.message });
+  }
 });
 
 module.exports = userRouter;

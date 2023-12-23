@@ -5,18 +5,21 @@ const createError = require("http-errors");
 const { errorResponse } = require("./src/handler/responseHandler");
 const productRouter = require("./src/routes/productRouter");
 const cartRouter = require("./src/routes/cartRoute");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// listening port
-app.listen(port, async () => {
-  console.log(`server is running on http://localhost:${port}`);
-  await connectToDatabase();
-});
-
 // middlewares
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
 
 // routers
 app.use("/api", userRouter);
@@ -34,4 +37,9 @@ app.use(function (req, res, next) {
 
 app.use((err, req, res, next) => {
   return errorResponse(res, { status: err.status, message: err.message });
+});
+// listening port
+app.listen(port, async () => {
+  console.log(`server is running on http://localhost:${port}`);
+  await connectToDatabase();
 });

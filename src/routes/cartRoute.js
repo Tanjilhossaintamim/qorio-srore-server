@@ -5,12 +5,13 @@ const {
   errorResponse,
   successResponse,
 } = require("../handler/responseHandler");
+const verifytoken = require("../middlewares/verifyToken");
 
 const cartRouter = Router();
 
-cartRouter.post("/addToCart", async (req, res) => {
+cartRouter.post("/addToCart", verifytoken, async (req, res) => {
   const { product, quantity, color, size } = req.body;
-  const userId = "6585a66019153478ea4c6c4e";
+  const userId = req.user._id;
 
   try {
     // check product id isValid or not
@@ -93,8 +94,8 @@ cartRouter.post("/addToCart", async (req, res) => {
   }
 });
 // get user cart product
-cartRouter.get("/", async (req, res) => {
-  const userId = "6585a66019153478ea4c6c4e";
+cartRouter.get("/", verifytoken, async (req, res) => {
+  const userId = req.user._id;
 
   try {
     const results = await Cart.findOne({ user: userId, active: true }).populate(
@@ -123,9 +124,9 @@ cartRouter.get("/", async (req, res) => {
 });
 
 // quantityUpdate
-cartRouter.patch("/updateQuantity", async (req, res) => {
+cartRouter.patch("/updateQuantity", verifytoken, async (req, res) => {
   const { productId, type } = req.body;
-  const userId = "6585a66019153478ea4c6c4e";
+  const userId = req.user._id;
   try {
     const userCart = await Cart.findOne({
       user: userId,
@@ -197,9 +198,9 @@ cartRouter.patch("/updateQuantity", async (req, res) => {
 });
 
 // delete cart item
-cartRouter.delete("/delete/:id", async (req, res) => {
+cartRouter.delete("/delete/:id", verifytoken, async (req, res) => {
   const productId = req.params.id;
-  const userId = "6585a66019153478ea4c6c4e";
+  const userId = req.user._id;
 
   try {
     const userCart = await Cart.findOne({
@@ -209,7 +210,7 @@ cartRouter.delete("/delete/:id", async (req, res) => {
       path: "products.product",
       select: ["title", "price"],
     });
-   
+
     const newProductArray = userCart.products.filter(
       (item) => item._id != productId
     );
