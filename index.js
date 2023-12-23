@@ -4,6 +4,7 @@ const userRouter = require("./src/routes/userRouter");
 const createError = require("http-errors");
 const { errorResponse } = require("./src/handler/responseHandler");
 const productRouter = require("./src/routes/productRouter");
+const cartRouter = require("./src/routes/cartRoute");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.use(express.json());
 // routers
 app.use("/api", userRouter);
 app.use("/api/products", productRouter);
+app.use("/api/carts", cartRouter);
 
 app.get("/", (req, res) => {
   res.send("server is running");
