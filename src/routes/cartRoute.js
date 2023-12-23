@@ -196,4 +196,31 @@ cartRouter.patch("/updateQuantity", async (req, res) => {
   }
 });
 
+// delete cart item
+cartRouter.delete("/delete/:id", async (req, res) => {
+  const productId = req.params.id;
+  const userId = "6585a66019153478ea4c6c4e";
+
+  try {
+    const userCart = await Cart.findOne({
+      user: userId,
+      active: true,
+    }).populate({
+      path: "products.product",
+      select: ["title", "price"],
+    });
+   
+    const newProductArray = userCart.products.filter(
+      (item) => item._id != productId
+    );
+
+    userCart.products = newProductArray;
+    await userCart.save();
+    return successResponse(res, {
+      status: 200,
+      message: "Product Delete Successfully !",
+    });
+  } catch (error) {}
+});
+
 module.exports = cartRouter;
