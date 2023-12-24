@@ -26,7 +26,7 @@ const html = (name, token) => `
     </tr>
     <tr>
         <td align="center">
-            <a href="http://localhost:5173/api/verify/${token}" style="display: inline-block; padding: 15px 30px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 18px;">Verify Account</a>
+            <a href="http://localhost:5173/verify/${token}" style="display: inline-block; padding: 15px 30px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 18px;">Verify Account</a>
         </td>
     </tr>
 </table>

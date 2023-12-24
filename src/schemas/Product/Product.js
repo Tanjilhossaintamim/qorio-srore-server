@@ -11,23 +11,23 @@ const productSchema = new Schema({
       color: {
         type: String,
         required: true,
-        enum: ["red", "green", "blue", "pink"],
+        enum: ["red", "green", "blue", "pink", "white", "black", "yellow","orange"],
       },
       image: {
         type: String,
         required: true,
       },
-      size: [
-        {
-          sizeName: String,
-        },
-      ],
     },
   ],
   price: {
     type: Number,
     required: true,
   },
+  size: [
+    {
+      sizeName: String,
+    },
+  ],
 });
 
 const Product = model("Product", productSchema);

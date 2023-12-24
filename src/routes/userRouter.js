@@ -9,6 +9,7 @@ const { emailWithNodemailer } = require("../config/email");
 const html = require("../utils/template");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const verifytoken = require("../middlewares/verifyToken");
 
 const userRouter = Router();
 
@@ -42,7 +43,10 @@ userRouter.post("/register", async (req, res) => {
   } catch (error) {
     return errorResponse(res, { status: 500, message: "failed" });
   }
-  res.send(token);
+  return successResponse(res, {
+    status: 200,
+    message: "please check your email we send a verify link!",
+  });
 });
 
 // verify user route
@@ -81,6 +85,7 @@ userRouter.post("/verify", async (req, res) => {
 
 userRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
+
   // validation first step
   if (!email || !password) {
     return errorResponse(res, {
@@ -98,7 +103,10 @@ userRouter.post("/login", async (req, res) => {
     }
 
     // valid password checking
-    const isPasswordMatched = bcrypt.compare(password, userExists.password);
+    const isPasswordMatched = await bcrypt.compare(
+      password,
+      userExists.password
+    );
     if (!isPasswordMatched) {
       return errorResponse(res, { status: 401, message: "Invalid Password !" });
     }
@@ -119,6 +127,7 @@ userRouter.post("/login", async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     });
+
     return successResponse(res, {
       status: 200,
       message: "Login Successfully !",
@@ -130,6 +139,24 @@ userRouter.post("/login", async (req, res) => {
     });
   } catch (error) {
     return errorResponse(res, { status: 500, message: error?.message });
+  }
+});
+//logout
+userRouter.post("/logout", (req, res) => {
+  res.clearCookie("token", { maxAge: 0 }).send({ success: true });
+});
+// check if token is expired or not
+userRouter.post("/verifyLogin", verifytoken, async (req, res) => {
+  const userId = req.user._id;
+  try {
+    const result = await User.findById(userId).select(["-password"]);
+    return successResponse(res, {
+      status: 200,
+      message: "still login",
+      payload: result,
+    });
+  } catch (error) {
+    return errorResponse(res, { status: 500, message: err?.message });
   }
 });
 

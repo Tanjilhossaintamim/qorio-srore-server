@@ -101,7 +101,7 @@ cartRouter.get("/", verifytoken, async (req, res) => {
     const results = await Cart.findOne({ user: userId, active: true }).populate(
       {
         path: "products.product",
-        select: "title",
+        select: ["title", "variation"],
       }
     );
     //calculate total price
@@ -126,6 +126,7 @@ cartRouter.get("/", verifytoken, async (req, res) => {
 // quantityUpdate
 cartRouter.patch("/updateQuantity", verifytoken, async (req, res) => {
   const { productId, type } = req.body;
+  console.log(productId);
   const userId = req.user._id;
   try {
     const userCart = await Cart.findOne({
@@ -133,11 +134,12 @@ cartRouter.patch("/updateQuantity", verifytoken, async (req, res) => {
       active: true,
     }).populate({
       path: "products.product",
-      select: ["title", "price"],
+      select: ["title", "price", "_id"],
     });
+
     if (userCart?._id) {
       const existingProduct = userCart.products.find(
-        (item) => (item._id = productId)
+        (item) => (item.product._id = productId)
       );
 
       if (existingProduct?._id) {
@@ -145,7 +147,7 @@ cartRouter.patch("/updateQuantity", verifytoken, async (req, res) => {
         if (type == "inc") {
           existingProduct.price =
             existingProduct.product.price * (existingProduct.quantity + 1);
-          existingProduct.quantity += 1;
+          existingProduct.quantity = existingProduct.quantity + 1;
           await userCart.save();
           return successResponse(res, {
             status: 201,
@@ -168,7 +170,7 @@ cartRouter.patch("/updateQuantity", verifytoken, async (req, res) => {
             console.log("delete");
             //if product quantity 1 then this login will remove the product from cart
             const newProductArray = userCart.products.filter(
-              (item) => item._id != productId
+              (item) => item.product._id != productId
             );
 
             userCart.products = newProductArray;
@@ -208,11 +210,11 @@ cartRouter.delete("/delete/:id", verifytoken, async (req, res) => {
       active: true,
     }).populate({
       path: "products.product",
-      select: ["title", "price"],
+      select: ["title", "price","_id"],
     });
 
     const newProductArray = userCart.products.filter(
-      (item) => item._id != productId
+      (item) => item.product._id != productId
     );
 
     userCart.products = newProductArray;
