@@ -21,12 +21,12 @@ const html = (name, token) => `
     </tr>
     <tr>
         <td>
-            <p style="color: #666666; line-height: 1.6; font-size: 16px;">Welcome to our community! We're thrilled to have you on board. Please click <a href="http://localhost:5173/api/verify/${token}" style="color: #3498db; text-decoration: none;" target="_blank">here</a> to verify your account.</p>
+            <p style="color: #666666; line-height: 1.6; font-size: 16px;">Welcome to our community! We're thrilled to have you on board. Please click <a href="https://qorio-store.netlify.app/verify/${token}" style="color: #3498db; text-decoration: none;" target="_blank">here</a> to verify your account.</p>
         </td>
     </tr>
     <tr>
         <td align="center">
-            <a href="http://localhost:5173/verify/${token}" style="display: inline-block; padding: 15px 30px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 18px;">Verify Account</a>
+            <a href="https://qorio-store.netlify.app/verify/${token}" style="display: inline-block; padding: 15px 30px; background-color: #3498db; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 18px;">Verify Account</a>
         </td>
     </tr>
 </table>

@@ -11,10 +11,13 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
+// database connection
+connectToDatabase();
+
 // middlewares
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://qorio-store.netlify.app/"],
     credentials: true,
   })
 );
@@ -41,5 +44,4 @@ app.use((err, req, res, next) => {
 // listening port
 app.listen(port, async () => {
   console.log(`server is running on http://localhost:${port}`);
-  await connectToDatabase();
 });
